@@ -89,7 +89,9 @@ public class CurrencyConvert extends JFrame implements ActionListener {
     JTextField jT1 = new JTextField(12);
     JButton converto = new JButton("Convert");
     JList<String> liste1 = new JList<>();
-
+  // Currency selection dropdown (JComboBox)
+  String[] currencies = { "USD", "EUR", "DH" };
+  JComboBox<String> currencySelection = new JComboBox<>(currencies);
     public CurrencyConvert() {
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setLayout(new BorderLayout());
@@ -98,7 +100,9 @@ public class CurrencyConvert extends JFrame implements ActionListener {
         jp1.setLayout(new FlowLayout());
         jp1.add(nombreAconvertit);
         jp1.add(jT1);
+        jp1.add(currencySelection); 
         jp1.add(converto);
+      
 
         JPanel jp2 = new JPanel();
         jp2.setLayout(new GridLayout(1, 2));
@@ -119,16 +123,28 @@ public class CurrencyConvert extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == converto) {
             String input = jT1.getText();
+            String selectedCurrency = (String) currencySelection.getSelectedItem();
             try {
                 double amount = Double.parseDouble(input);
 
                 // Assuming input is in EUR and converting it
-                montant montant = new montantEUR(amount);
+                montant montant = null;
+                switch (selectedCurrency) {
+                    case "USD":
+                        montant = new montantUSD(amount);
+                        break;
+                    case "EUR":
+                        montant = new montantEUR(amount);
+                        break;
+                    case "DH":
+                        montant = new montantDH(amount);
+                        break;
+                }
 
                 String result = "Converted amount: \n";
                 result += "To USD: " + montant.ConvertoUSD() + "\n";
                 result += "To DH: " + montant.ConvertoDH() + "\n";
-
+                result += "To EUR: " + montant.ConvertoEUR() + "\n";
                 DefaultListModel<String> model = new DefaultListModel<>();
                 model.addElement(result);
                 liste1.setModel(model);
