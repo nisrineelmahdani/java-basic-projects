@@ -1,121 +1,130 @@
-import java.util.List;
-
 import javax.swing.*;
 import java.awt.*;
-// interface simple gui:
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
- abstract class montant{
+
+abstract class Montant {
     private double nombreAconvertit;
-         public montant(double nombreAconvertit){
-            this.nombreAconvertit=nombreAconvertit;
-        }
-        public double getnombreAconvertit(){
-            return nombreAconvertit;
-        }
-        public void setnombreAconvertit( double nombreAconvertit){
-            this.nombreAconvertit= nombreAconvertit;
-        }
-        public abstract double ConvertoEUR();
-        public abstract double ConvertoUSD();
-        public abstract double ConvertoDH();
-       
-}
-class montantUSD extends montant implements currencyConverter{
-            public montantUSD( double nombreAconvertit){
-                super(  nombreAconvertit);
-                
-             }
 
-           
-            public double ConvertoEUR() {
-                return this.getnombreAconvertit() * 0.915;
-            }
-            public double ConvertoDH() {
-                return this.getnombreAconvertit() * 9.8;
-            }
+    public Montant(double nombreAconvertit) {
+        this.nombreAconvertit = nombreAconvertit;
+    }
 
+    public double getnombreAconvertit() {
+        return nombreAconvertit;
+    }
 
-            @Override
-            public double ConvertoUSD() {
-                return this.getnombreAconvertit(); // no changes
-            }
+    public void setnombreAconvertit(double nombreAconvertit) {
+        this.nombreAconvertit = nombreAconvertit;
+    }
+
+    public abstract double ConvertoEUR();
+    public abstract double ConvertoUSD();
+    public abstract double ConvertoDH();
 }
 
-class montantEUR extends montant implements currencyConverter{
-     public montantEUR(double nombreAconvertit){
+class MontantUSD extends Montant {
+    public MontantUSD(double nombreAconvertit) {
         super(nombreAconvertit);
     }
 
-  
+    public double ConvertoEUR() {
+        return this.getnombreAconvertit() * 0.915;
+    }
+
+    public double ConvertoDH() {
+        return this.getnombreAconvertit() * 9.8;
+    }
+
+    @Override
+    public double ConvertoUSD() {
+        return this.getnombreAconvertit();
+    }
+}
+
+class MontantEUR extends Montant {
+    public MontantEUR(double nombreAconvertit) {
+        super(nombreAconvertit);
+    }
+
     public double ConvertoUSD() {
         return this.getnombreAconvertit() * 1.093;
     }
+
     public double ConvertoDH() {
         return this.getnombreAconvertit() * 10.7;
     }
-
 
     @Override
     public double ConvertoEUR() {
         return this.getnombreAconvertit();
     }
-
 }
-class montantDH extends montant implements currencyConverter{
-     public montantDH(double montantDH){
+
+class MontantDH extends Montant {
+    public MontantDH(double montantDH) {
         super(montantDH);
-
-     }
-
+    }
 
     public double ConvertoUSD() {
         return this.getnombreAconvertit() * 0.27;
+    }
 
-}
-public double ConvertoEUR() {
-    return this.getnombreAconvertit() * 0.092;
+    public double ConvertoEUR() {
+        return this.getnombreAconvertit() * 0.092;
+    }
 
+    @Override
+    public double ConvertoDH() {
+        return this.getnombreAconvertit();
+    }
 }
 
-
-@Override
-public double ConvertoDH() {
-   return this.getnombreAconvertit();
-}
-}
 public class CurrencyConvert extends JFrame implements ActionListener {
-    JLabel nombreAconvertit = new JLabel("Montant a convertir:");
+    JLabel nombreAconvertit = new JLabel("Montant à convertir:");
     JTextField jT1 = new JTextField(12);
     JButton converto = new JButton("Convert");
-    JList<String> liste1 = new JList<>();
-  // Currency selection dropdown (JComboBox)
-  String[] currencies = { "USD", "EUR", "DH" };
-  JComboBox<String> currencySelection = new JComboBox<>(currencies);
+    DefaultListModel<String> model = new DefaultListModel<>();
+    JList<String> liste1 = new JList<>(model);
+    String[] currencies = { "USD", "EUR", "DH" };
+    JComboBox<String> currencySelection = new JComboBox<>(currencies);
+
     public CurrencyConvert() {
+        // Window settings
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.setTitle("Convertisseur de Monnaie");
+        this.setSize(400, 300);
+        this.setLocationRelativeTo(null);
         this.setLayout(new BorderLayout());
 
-        JPanel jp1 = new JPanel();
-        jp1.setLayout(new FlowLayout());
+        // Styling components
+        nombreAconvertit.setFont(new Font("Arial", Font.BOLD, 14));
+        nombreAconvertit.setForeground(new Color(30, 144, 255));
+        jT1.setFont(new Font("Arial", Font.PLAIN, 14));
+        converto.setFont(new Font("Arial", Font.BOLD, 14));
+        converto.setBackground(new Color(60, 179, 113));
+        converto.setForeground(Color.WHITE);
+        liste1.setFont(new Font("Arial", Font.PLAIN, 14));
+
+        // Panel 1 (Input and Button)
+        JPanel jp1 = new JPanel(new FlowLayout());
         jp1.add(nombreAconvertit);
         jp1.add(jT1);
-        jp1.add(currencySelection); 
+        jp1.add(currencySelection);
         jp1.add(converto);
-      
 
-        JPanel jp2 = new JPanel();
-        jp2.setLayout(new GridLayout(1, 2));
-        jp2.add(liste1);
+        // Panel 2 (Display Results)
+        JPanel jp2 = new JPanel(new BorderLayout());
+        liste1.setBackground(new Color(245, 245, 245)); // Light gray background for list
+        jp2.add(new JScrollPane(liste1), BorderLayout.CENTER);
 
+        // Add panels to frame
         this.add(jp1, BorderLayout.NORTH);
         this.add(jp2, BorderLayout.CENTER);
 
+        // Action listener for button
         converto.addActionListener(this);
-        
 
-        this.setBounds(10, 10, 500, 500);
-        this.setSize(Toolkit.getDefaultToolkit().getScreenSize());
         this.setVisible(true);
     }
 
@@ -126,32 +135,31 @@ public class CurrencyConvert extends JFrame implements ActionListener {
             String selectedCurrency = (String) currencySelection.getSelectedItem();
             try {
                 double amount = Double.parseDouble(input);
+                Montant montant = null;
 
-                // Assuming input is in EUR and converting it
-                montant montant = null;
+                // Choose the currency class based on selection
                 switch (selectedCurrency) {
                     case "USD":
-                        montant = new montantUSD(amount);
+                        montant = new MontantUSD(amount);
                         break;
                     case "EUR":
-                        montant = new montantEUR(amount);
+                        montant = new MontantEUR(amount);
                         break;
                     case "DH":
-                        montant = new montantDH(amount);
+                        montant = new MontantDH(amount);
                         break;
                 }
 
-                String result = "Converted amount: \n";
-                result += "To USD: " + montant.ConvertoUSD() + "\n";
-                result += "To DH: " + montant.ConvertoDH() + "\n";
-                result += "To EUR: " + montant.ConvertoEUR() + "\n";
-                DefaultListModel<String> model = new DefaultListModel<>();
-                model.addElement(result);
-                liste1.setModel(model);
+                // Display the conversion results
+                String result = "Montant converti:\n";
+                result += String.format("Vers USD: %.2f\n", montant.ConvertoUSD());
+                result += String.format("Vers DH: %.2f\n", montant.ConvertoDH());
+                result += String.format("Vers EUR: %.2f\n", montant.ConvertoEUR());
+                model.addElement(result);  // Add result to list
 
                 jT1.setText("");
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Veuillez entrer un nombre valide.", "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
@@ -160,53 +168,3 @@ public class CurrencyConvert extends JFrame implements ActionListener {
         new CurrencyConvert();
     }
 }
-
-
-     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* 
-public class CurrencyConvert {
-
-    public static void main(String[] args) {
-        montantDH montantDH = new montantDH(100);
-        montantEUR montantEUR = new montantEUR(100);
-        montantUSD montantUSD = new montantUSD(100);
-        System.out.println("dh to euro:"+montantDH.ConvertoEUR()); 
-        System.out.println("dh to usd"+montantDH.ConvertoUSD());
-        System.out.println("dh to dh "+ montantDH.ConvertoDH());
-
-        System.out.println("EUR to euro:"+montantEUR.ConvertoEUR()); 
-        System.out.println("EUR to usd"+montantEUR.ConvertoUSD());
-        System.out.println("EUR to DH "+ montantEUR.ConvertoDH());
-
-        System.out.println("USD to USD:"+montantUSD.ConvertoUSD()); 
-        System.out.println("USD to EUR"+montantUSD.ConvertoEUR());
-        System.out.println("USD to DH "+ String.format("%.2f", montantUSD.ConvertoDH()));
-    }
-    
-}*/
-
-
